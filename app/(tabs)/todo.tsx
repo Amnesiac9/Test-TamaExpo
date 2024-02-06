@@ -5,18 +5,27 @@ import Constants from "expo-constants";
 import * as SQLite from "expo-sqlite";
 import { SQLError } from "expo-sqlite";
 import React from "react";
-import { addTime, db } from "./index";
+
+function openDatabase() {
+    if (Platform.OS === "web") {
+        return {
+            transaction: () => {
+                return {
+                    executeSql: () => {},
+                };
+            },
+        };
+    }
+
+    const db = SQLite.openDatabase("db.db");
+    return db;
+}
+
+const db = openDatabase();
 
 interface ItemsProps {
     done: boolean;
     onPressItem: (id: number) => void; // replace with the actual type
-    db: SQLite.SQLiteDatabase;
-}
-
-interface TimeCardProps {
-    // add: (text: string, forceUpdate: () => void) => void; // replace with the actual type
-    addTime: typeof addTime;
-    db: SQLite.SQLiteDatabase;
 }
 
 interface Item {
@@ -26,7 +35,7 @@ interface Item {
     // add other properties here...
 }
 
-function Items({ done: doneHeading, onPressItem, db }: ItemsProps) {
+function Items({ done: doneHeading, onPressItem }: ItemsProps) {
     const [items, setItems] = useState<Item[] | null>(null);
 
     useEffect(() => {
@@ -61,8 +70,8 @@ function Items({ done: doneHeading, onPressItem, db }: ItemsProps) {
         </View>
     );
 }
-//{ done: doneHeading, onPressItem, db }: ItemsProps
-export default function TimeCard({ addTime, db }: TimeCardProps) {
+
+export default function TabTwoScreen() {
     const [text, setText] = React.useState<string | null>(null);
     const [forceUpdate, forceUpdateId] = useForceUpdate();
 
@@ -71,6 +80,24 @@ export default function TimeCard({ addTime, db }: TimeCardProps) {
             tx.executeSql("create table if not exists items (id integer primary key not null, done int, value text);");
         });
     }, []);
+
+    const add = (text: string) => {
+        // is text empty?
+        if (text === null || text === "") {
+            return false;
+        }
+
+        db.transaction(
+            (tx) => {
+                tx.executeSql("insert into items (done, value) values (0, ?)", [text]);
+                tx.executeSql("select * from items", [], (_, { rows }) => console.log(JSON.stringify(rows)));
+            },
+            (error: SQLError) => {
+                console.error("An error occurred while executing the transaction:", error);
+            },
+            forceUpdate as () => void // forceUpdate is a function, but TypeScript doesn't know that?
+        );
+    };
 
     return (
         <View style={styles.container}>
@@ -89,7 +116,7 @@ export default function TimeCard({ addTime, db }: TimeCardProps) {
                                 if (text === null) {
                                     return;
                                 }
-                                addTime(text, forceUpdate as () => void);
+                                add(text);
                                 setText(null);
                             }}
                             placeholder="what do you need to do?"
@@ -99,7 +126,6 @@ export default function TimeCard({ addTime, db }: TimeCardProps) {
                     </View>
                     <ScrollView style={styles.listArea}>
                         <Items
-                            db={db}
                             key={`forceupdate-todo-${forceUpdateId}`}
                             done={false}
                             onPressItem={(id) =>
@@ -115,7 +141,6 @@ export default function TimeCard({ addTime, db }: TimeCardProps) {
                             }
                         />
                         <Items
-                            db={db}
                             done
                             key={`forceupdate-done-${forceUpdateId}`}
                             onPressItem={(id) =>

@@ -13,7 +13,7 @@ export default function TabLayout() {
             <Tabs.Screen
                 name="index"
                 options={{
-                    title: "Tab One",
+                    title: "Clock In",
                     tabBarIcon: ({ color }) => <Text>Hello!</Text>,
                     headerRight: () => (
                         <Link href="/modal" asChild>
@@ -25,9 +25,16 @@ export default function TabLayout() {
                 }}
             />
             <Tabs.Screen
+                name="todo"
+                options={{
+                    title: "Todo",
+                    tabBarIcon: ({ color }) => <Text>Hello!</Text>,
+                }}
+            />
+            <Tabs.Screen
                 name="timesheet"
                 options={{
-                    title: "Time Sheet",
+                    title: "Timesheet",
                     tabBarIcon: ({ color }) => <Text>Hello!</Text>,
                 }}
             />
