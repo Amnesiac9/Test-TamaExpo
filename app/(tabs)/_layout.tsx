@@ -25,9 +25,9 @@ export default function TabLayout() {
                 }}
             />
             <Tabs.Screen
-                name="two"
+                name="timesheet"
                 options={{
-                    title: "Tab Two",
+                    title: "Time Sheet",
                     tabBarIcon: ({ color }) => <Text>Hello!</Text>,
                 }}
             />
