@@ -26,7 +26,7 @@ interface Item {
     // add other properties here...
 }
 
-function Items({ done: doneHeading, onPressItem, db }: ItemsProps) {
+function Items({ done: doneHeading, onPressItem, db: db }: ItemsProps) {
     const [items, setItems] = useState<Item[] | null>(null);
 
     useEffect(() => {
@@ -62,7 +62,7 @@ function Items({ done: doneHeading, onPressItem, db }: ItemsProps) {
     );
 }
 //{ done: doneHeading, onPressItem, db }: ItemsProps
-export default function TimeCard({ addTime, db }: TimeCardProps) {
+export default function TimeCard() {
     const [text, setText] = React.useState<string | null>(null);
     const [forceUpdate, forceUpdateId] = useForceUpdate();
 
