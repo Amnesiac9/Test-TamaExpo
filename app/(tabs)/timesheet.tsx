@@ -5,12 +5,12 @@ import Constants from "expo-constants";
 import * as SQLite from "expo-sqlite";
 import { SQLError } from "expo-sqlite";
 import React from "react";
-import { addTime, db } from "./index";
+import { addTime, db, deleteTime, updateTime, useForceUpdate } from "../shared";
 
 interface ItemsProps {
     done: boolean;
-    onPressItem: (id: number) => void; // replace with the actual type
-    db: SQLite.SQLiteDatabase;
+    onPressItem: (id: number) => void; //(id: number) => void replace with the actual type
+    forceUpdate: () => void;
 }
 
 interface TimeCardProps {
@@ -26,7 +26,7 @@ interface Item {
     // add other properties here...
 }
 
-function Items({ done: doneHeading, onPressItem, db: db }: ItemsProps) {
+function Items({ done: doneHeading, onPressItem }: ItemsProps) {
     const [items, setItems] = useState<Item[] | null>(null);
 
     useEffect(() => {
@@ -34,6 +34,10 @@ function Items({ done: doneHeading, onPressItem, db: db }: ItemsProps) {
             tx.executeSql(`select * from items where done = ?;`, [doneHeading ? 1 : 0], (_, { rows: { _array } }) => setItems(_array));
         });
     }, []);
+
+    // useEffect(() => {
+    //     forceUpdate();
+    // }, [items]);
 
     const heading = doneHeading ? "Completed" : "Todo";
 
@@ -47,7 +51,7 @@ function Items({ done: doneHeading, onPressItem, db: db }: ItemsProps) {
             {items.map(({ id, done, value }) => (
                 <TouchableOpacity
                     key={id}
-                    onPress={() => onPressItem && onPressItem(id)}
+                    onPress={() => onPressItem(id)} // onPressItem &&
                     style={{
                         backgroundColor: done ? "#1c9963" : "#fff",
                         borderColor: "#000",
@@ -67,7 +71,7 @@ export default function TimeCard() {
     const [forceUpdate, forceUpdateId] = useForceUpdate();
 
     useEffect(() => {
-        db.transaction((tx) => {
+        db.transaction((tx: SQLite.SQLTransaction) => {
             tx.executeSql("create table if not exists items (id integer primary key not null, done int, value text);");
         });
     }, []);
@@ -99,47 +103,22 @@ export default function TimeCard() {
                     </View>
                     <ScrollView style={styles.listArea}>
                         <Items
-                            db={db}
                             key={`forceupdate-todo-${forceUpdateId}`}
                             done={false}
-                            onPressItem={(id) =>
-                                db.transaction(
-                                    (tx) => {
-                                        tx.executeSql(`update items set done = 1 where id = ?;`, [id]);
-                                    },
-                                    (error: SQLError) => {
-                                        console.error("An error occurred while executing the transaction:", error);
-                                    },
-                                    forceUpdate as () => void // forceUpdate is a function, but TypeScript doesn't know that?
-                                )
-                            }
+                            onPressItem={(id) => updateTime(id, forceUpdate as () => void)}
+                            forceUpdate={forceUpdate as () => void}
                         />
                         <Items
-                            db={db}
-                            done
                             key={`forceupdate-done-${forceUpdateId}`}
-                            onPressItem={(id) =>
-                                db.transaction(
-                                    (tx) => {
-                                        tx.executeSql(`delete from items where id = ?;`, [id]);
-                                    },
-                                    (error: SQLError) => {
-                                        console.error("An error occurred while executing the transaction:", error);
-                                    },
-                                    forceUpdate as () => void // forceUpdate is a function, but TypeScript doesn't know that?
-                                )
-                            }
+                            done={true}
+                            onPressItem={(id) => deleteTime(id, forceUpdate as () => void)}
+                            forceUpdate={forceUpdate as () => void}
                         />
                     </ScrollView>
                 </>
             )}
         </View>
     );
-}
-
-function useForceUpdate() {
-    const [value, setValue] = useState(0);
-    return [() => setValue(value + 1), value];
 }
 
 const styles = StyleSheet.create({
