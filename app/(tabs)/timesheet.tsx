@@ -1,14 +1,12 @@
-import { useState, useEffect, useContext } from "react";
-import { Platform, ScrollView, StyleSheet, TextInput, TouchableOpacity } from "react-native";
-import { Text, View } from "tamagui";
+import { useEffect, useContext } from "react";
+import { Platform, StyleSheet, TextInput, TouchableOpacity } from "react-native";
+import { Theme, Text, View, ListItem, Separator, Group, XGroup, YGroup, YStack, ScrollView } from "tamagui";
 import Constants from "expo-constants";
 import * as SQLite from "expo-sqlite";
-import { SQLError } from "expo-sqlite";
 import React from "react";
-import { ItemsContext, addTime, db, deleteTime, updateTime, useForceUpdate } from "../shared";
+import { ItemsContext, addTime, db, deleteTime, updateTime, useForceUpdate, createTimesheetTable } from "../shared";
 
 interface ItemsProps {
-    done: boolean;
     onPressItem: (id: number) => void; //(id: number) => void replace with the actual type
 }
 
@@ -18,14 +16,7 @@ interface TimeCardProps {
     db: SQLite.SQLiteDatabase;
 }
 
-interface Item {
-    id: number;
-    done: boolean;
-    value: string;
-    // add other properties here...
-}
-
-function Items({ done: doneHeading, onPressItem }: ItemsProps) {
+function Items({ onPressItem }: ItemsProps) {
     const { items, setItems } = useContext(ItemsContext);
 
     // useEffect(() => {
@@ -44,29 +35,51 @@ function Items({ done: doneHeading, onPressItem }: ItemsProps) {
         return null;
     }
 
-    const heading = doneHeading ? "Completed" : "Todo";
+    // const heading = doneHeading ? "Completed" : "Todo";
 
-    // Filter items based on their done status
-    const filteredItems = items.filter((item) => Boolean(item.done) === doneHeading);
+    // // Filter items based on their done status
+    // const filteredItems = items.filter((item) => Boolean(item.done) === doneHeading);
 
     return (
-        <View style={styles.sectionContainer}>
-            <Text style={styles.sectionHeading}>{heading}</Text>
-            {filteredItems.map(({ id, done, value }) => (
-                <TouchableOpacity
-                    key={id}
-                    onPress={() => onPressItem(id)} // onPressItem &&
-                    style={{
-                        backgroundColor: done ? "#1c9963" : "#fff",
-                        borderColor: "#000",
-                        borderWidth: 1,
-                        padding: 8,
-                    }}
-                >
-                    <Text style={{ color: done ? "#fff" : "#000" }}>{value}</Text>
-                </TouchableOpacity>
-            ))}
-        </View>
+        <Theme name="green">
+            <View flex={1} alignItems="center">
+                <Text>Timesheet</Text>
+                {items.map(({ id, date, startTime, endTime, hours, wages, note }) => (
+                    <XGroup orientation="horizontal" separator={<Separator />} padding="$3" space="$2">
+                        <Group.Item>
+                            <Text>{date}</Text>
+                        </Group.Item>
+                        <Group.Item>
+                            <Text>{startTime}</Text>
+                        </Group.Item>
+                        <Group.Item>
+                            <Text>{endTime}</Text>
+                        </Group.Item>
+                        <Group.Item>
+                            <Text>{hours}</Text>
+                        </Group.Item>
+                        <Group.Item>
+                            <Text>{wages}</Text>
+                        </Group.Item>
+                        <Group.Item>
+                            <Text>{note}</Text>
+                        </Group.Item>
+                    </XGroup>
+                    // <TouchableOpacity
+                    //     key={id}
+                    //     onPress={() => onPressItem(id)} // onPressItem &&
+                    //     style={{
+                    //         // backgroundColor: done ? "#1c9963" : "#fff",
+                    //         borderColor: "#000",
+                    //         borderWidth: 1,
+                    //         padding: 8,
+                    //     }}
+                    // >
+                    //     <Text style={{ color: done ? "#fff" : "#000" }}>{value}</Text>
+                    // </TouchableOpacity>
+                ))}
+            </View>
+        </Theme>
     );
 }
 //{ done: doneHeading, onPressItem, db }: ItemsProps
@@ -76,43 +89,41 @@ export default function TimeCard() {
     // const [forceUpdate, forceUpdateId] = useForceUpdate();
 
     useEffect(() => {
-        db.transaction((tx: SQLite.SQLTransaction) => {
-            tx.executeSql("create table if not exists items (id integer primary key not null, done int, value text);");
-        });
+        createTimesheetTable();
     }, []);
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.heading}>SQLite Example</Text>
-
-            {Platform.OS === "web" ? (
-                <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                    <Text style={styles.heading}>Expo SQlite is not supported on web!</Text>
-                </View>
-            ) : (
-                <>
-                    <View style={styles.flexRow}>
-                        <TextInput
-                            onChangeText={(text) => setText(text)}
-                            onSubmitEditing={() => {
-                                if (text === null) {
-                                    return;
-                                }
-                                addTime(text, setItems);
-                                setText(null);
-                            }}
-                            placeholder="what do you need to do?"
-                            style={styles.input}
-                            value={text ?? undefined}
-                        />
+        <Theme name="green">
+            <View>
+                {Platform.OS === "web" ? (
+                    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                        <Text style={styles.heading}>Expo SQlite is not supported on web!</Text>
                     </View>
-                    <ScrollView style={styles.listArea}>
-                        <Items key={`forceupdate-todo`} done={false} onPressItem={(id) => updateTime(id, setItems)} />
-                        <Items key={`forceupdate-done`} done={true} onPressItem={(id) => deleteTime(id, setItems)} />
-                    </ScrollView>
-                </>
-            )}
-        </View>
+                ) : (
+                    <>
+                        {/* <View style={styles.flexRow}>
+                            <TextInput
+                                onChangeText={(text) => setText(text)}
+                                onSubmitEditing={() => {
+                                    if (text === null) {
+                                        return;
+                                    }
+                                    addTime(text, setItems);
+                                    setText(null);
+                                }}
+                                placeholder="what do you need to do?"
+                                style={styles.input}
+                                value={text ?? undefined}
+                            />
+                        </View> */}
+                        <ScrollView>
+                            <Items key={`times`} onPressItem={(id) => deleteTime(id, setItems)} />
+                            {/* <Items key={`forceupdate-done`} done={true} onPressItem={(id) => deleteTime(id, setItems)} /> */}
+                        </ScrollView>
+                    </>
+                )}
+            </View>
+        </Theme>
     );
 }
 

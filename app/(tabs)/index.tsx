@@ -5,8 +5,25 @@ import { addTime, useForceUpdate, ItemsContext } from "../shared";
 export default function TabOneScreen() {
     const { items, setItems } = useContext(ItemsContext);
 
-    function handleAddTime(time: string) {
-        addTime(time, setItems);
+    function handleAddTime() {
+        // Fake input for now
+
+        const date = new Date();
+        const startTime = date.setHours(9, 0, 0, 0);
+        const endTime = date.setHours(17, 0, 0, 0);
+        const hours = endTime - startTime;
+
+        const timeEntry = {
+            id: 0,
+            date: date.toDateString(),
+            startTime: startTime.toString(),
+            endTime: endTime.toString(),
+            hours: hours,
+            wages: hours * 15,
+            note: "Lunch",
+        };
+
+        addTime(timeEntry, setItems);
     }
 
     return (
@@ -20,7 +37,7 @@ export default function TabOneScreen() {
                 {/* <View width={"75%"}> */}
                 <Button>Clock In</Button>
                 <Separator borderWidth={0.5} width={"50%"} marginVertical={20} />
-                <Button onPress={() => handleAddTime("10:50")}>Add Time</Button>
+                <Button onPress={() => handleAddTime()}>Add Time</Button>
                 <Separator borderWidth={0.5} width={"50%"} marginVertical={20} />
                 <Button>View Timecard</Button>
                 {/* </View> */}

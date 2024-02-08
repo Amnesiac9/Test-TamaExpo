@@ -9,7 +9,7 @@ import { config } from "../tamagui.config";
 import { useFonts } from "expo-font";
 import { Dispatch, SetStateAction, useEffect } from "react";
 import React from "react";
-import { Item, ItemsProvider } from "./shared";
+import { timeEntry, ItemsProvider } from "./shared";
 
 export {
     // Catch any errors thrown by the Layout component.

@@ -26,10 +26,10 @@ export function useForceUpdate() {
     return [() => setValue(value + 1), value];
 }
 
-export const fetchItems = (setItems: Dispatch<SetStateAction<Item[] | null>>) => {
+export const fetchItems = (setItems: Dispatch<SetStateAction<timeEntry[] | null>>) => {
     db.transaction(
         (tx) => {
-            tx.executeSql("select * from items", [], (_, resultSet) => {
+            tx.executeSql("select * from timesheet", [], (_, resultSet) => {
                 const items = resultSet.rows._array;
                 setItems(items);
             });
@@ -40,15 +40,22 @@ export const fetchItems = (setItems: Dispatch<SetStateAction<Item[] | null>>) =>
     );
 };
 
-export const addTime = (text: string, setItems: Dispatch<SetStateAction<Item[] | null>>) => {
+export const addTime = (timeEntry: timeEntry, setItems: Dispatch<SetStateAction<timeEntry[] | null>>) => {
     // is text empty?
-    if (text === null || text === "") {
+    if (timeEntry === null || timeEntry.date === "") {
         return false;
     }
 
     db.transaction(
         (tx) => {
-            tx.executeSql("insert into items (done, value) values (0, ?)", [text]);
+            tx.executeSql("insert into timesheet (date, startTime, endTime, hours, wages, notes) values (?, ?, ?, ?, ?, ?)", [
+                timeEntry.date,
+                timeEntry.startTime,
+                timeEntry.endTime,
+                timeEntry.hours,
+                timeEntry.wages,
+                timeEntry.note,
+            ]);
         },
         (error: SQLError) => {
             console.error("An error occurred while executing the transaction:", error);
@@ -57,10 +64,10 @@ export const addTime = (text: string, setItems: Dispatch<SetStateAction<Item[] |
     );
 };
 
-export const deleteTime = (id: number, setItems: Dispatch<SetStateAction<Item[] | null>>) => {
+export const deleteTime = (id: number, setItems: Dispatch<SetStateAction<timeEntry[] | null>>) => {
     db.transaction(
         (tx: SQLite.SQLTransaction) => {
-            tx.executeSql(`delete from items where id = ?;`, [id]);
+            tx.executeSql(`delete from timesheet where id = ?;`, [id]);
         },
         (error: SQLError) => {
             console.error("An error occurred while executing the transaction:", error);
@@ -69,10 +76,10 @@ export const deleteTime = (id: number, setItems: Dispatch<SetStateAction<Item[] 
     );
 };
 
-export const updateTime = (id: number, setItems: Dispatch<SetStateAction<Item[] | null>>) => {
+export const updateTime = (id: number, setItems: Dispatch<SetStateAction<timeEntry[] | null>>) => {
     db.transaction(
         (tx: SQLite.SQLTransaction) => {
-            tx.executeSql(`update items set done = 1 where id = ?;`, [id]);
+            tx.executeSql(`update timesheet set date = date where id = ?;`, [id]);
         },
         (error: SQLError) => {
             console.error("An error occurred while executing the transaction:", error);
@@ -81,20 +88,34 @@ export const updateTime = (id: number, setItems: Dispatch<SetStateAction<Item[] 
     );
 };
 
-export interface Item {
+/**
+ * Interface for a time entry.
+ *
+ * @property {number} id - The unique ID of the time entry.
+ * @property {string} date - The date of the time entry, in the format 'YYYY-MM-DD'.
+ * @property {string} startTime - The start time of the time entry, in the format 'HH:MM:SS'.
+ * @property {string} endTime - The end time of the time entry, in the format 'HH:MM:SS'.
+ * @property {number} hours - The number of hours worked.
+ * @property {number} wages - The wages earned for the time entry.
+ * @property {string} notes - Any additional notes for the time entry.
+ */
+export interface timeEntry {
     id: number;
-    done: boolean;
-    value: string;
-    // add other properties here...
+    date: string;
+    startTime: string;
+    endTime: string;
+    hours: number;
+    wages: number;
+    note: string;
 }
 
 const ItemsContext = React.createContext({
-    items: null as Item[] | null,
-    setItems: (() => {}) as Dispatch<SetStateAction<Item[] | null>>,
+    items: null as timeEntry[] | null,
+    setItems: (() => {}) as Dispatch<SetStateAction<timeEntry[] | null>>,
 });
 
 function ItemsProvider({ children }: { children: ReactNode }) {
-    const [items, setItems] = useState<Item[] | null>(null);
+    const [items, setItems] = useState<timeEntry[] | null>(null);
 
     // Function to fetch items from database
     // const fetchItems = () => {
@@ -110,3 +131,19 @@ function ItemsProvider({ children }: { children: ReactNode }) {
 }
 
 export { ItemsContext, ItemsProvider };
+
+export function createTimesheetTable() {
+    db.transaction((tx: SQLite.SQLTransaction) => {
+        tx.executeSql(`
+            CREATE TABLE IF NOT EXISTS timesheet (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                date TEXT NOT NULL,
+                startTime TEXT NOT NULL,
+                endTime TEXT NOT NULL,
+                hours REAL NOT NULL,
+                wages REAL NOT NULL,
+                notes TEXT
+            );
+        `);
+    });
+}
