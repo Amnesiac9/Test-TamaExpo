@@ -10,20 +10,19 @@ export default function TabOneScreen() {
     const [forceUpdate, forceUpdateId] = useForceUpdate();
     return (
         <View flex={1} alignItems="center">
-            <Theme name="blue">
+            <Theme name="green">
                 <Separator marginVertical={20} />
                 <Separator marginVertical={20} />
                 <H2>Clock In</H2>
                 <Separator borderWidth={0.5} width={"75%"} marginVertical={20} />
                 <Separator marginVertical={100} />
-                <View width={"100%"}>
-                    <Button>Clock In</Button>
-                    <Separator borderWidth={0.5} width={"200px"} marginVertical={20} />
-                    <Button onPress={() => handleAddTime("10:50", forceUpdate as () => void)}>Add Time</Button>
-                    <Separator borderWidth={0.5} width={"100px"} marginVertical={20} />
-                    <Button>View Timecard</Button>
-                    <Separator borderWidth={0.5} width={"100px"} marginVertical={20} />
-                </View>
+                {/* <View width={"75%"}> */}
+                <Button>Clock In</Button>
+                <Separator borderWidth={0.5} width={"50%"} marginVertical={20} />
+                <Button onPress={() => handleAddTime("10:50", forceUpdate as () => void)}>Add Time</Button>
+                <Separator borderWidth={0.5} width={"50%"} marginVertical={20} />
+                <Button>View Timecard</Button>
+                {/* </View> */}
             </Theme>
         </View>
     );
