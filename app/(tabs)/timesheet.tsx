@@ -1,5 +1,5 @@
 import { useEffect, useContext } from "react";
-import { Platform, StyleSheet, TextInput, TouchableOpacity } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 import { Theme, Text, View, ListItem, Separator, Group, XGroup, YGroup, YStack, ScrollView } from "tamagui";
 import Constants from "expo-constants";
 import * as SQLite from "expo-sqlite";
@@ -41,52 +41,48 @@ function Items({ onPressItem }: ItemsProps) {
     // const filteredItems = items.filter((item) => Boolean(item.done) === doneHeading);
 
     return (
-        <Theme name="green">
-            <View flex={1} alignItems="center">
-                <Text>Timesheet</Text>
-                {items.map(({ id, date, startTime, endTime, hours, wages, note }) => (
-                    <XGroup orientation="horizontal" separator={<Separator />} padding="$3" space="$2">
-                        <Group.Item>
-                            <Text>{date}</Text>
-                        </Group.Item>
-                        <Group.Item>
-                            <Text>{startTime}</Text>
-                        </Group.Item>
-                        <Group.Item>
-                            <Text>{endTime}</Text>
-                        </Group.Item>
-                        <Group.Item>
-                            <Text>{hours}</Text>
-                        </Group.Item>
-                        <Group.Item>
-                            <Text>{wages}</Text>
-                        </Group.Item>
-                        <Group.Item>
-                            <Text>{note}</Text>
-                        </Group.Item>
-                    </XGroup>
-                    // <TouchableOpacity
-                    //     key={id}
-                    //     onPress={() => onPressItem(id)} // onPressItem &&
-                    //     style={{
-                    //         // backgroundColor: done ? "#1c9963" : "#fff",
-                    //         borderColor: "#000",
-                    //         borderWidth: 1,
-                    //         padding: 8,
-                    //     }}
-                    // >
-                    //     <Text style={{ color: done ? "#fff" : "#000" }}>{value}</Text>
-                    // </TouchableOpacity>
-                ))}
-            </View>
-        </Theme>
+        <>
+            <Text>Timesheet</Text>
+            {items.map(({ id, date, startTime, endTime, hours, wages, note }) => (
+                <XGroup orientation="vertical" separator={<Separator />} padding="$3" space="$2">
+                    <Group.Item>
+                        <Text>{date}</Text>
+                    </Group.Item>
+                    <Group.Item>
+                        <Text>{startTime}</Text>
+                    </Group.Item>
+                    <Group.Item>
+                        <Text>{endTime}</Text>
+                    </Group.Item>
+                    <Group.Item>
+                        <Text>{hours}</Text>
+                    </Group.Item>
+                    <Group.Item>
+                        <Text>{wages}</Text>
+                    </Group.Item>
+                    <Group.Item>
+                        <Text>{note}</Text>
+                    </Group.Item>
+                </XGroup>
+                // <TouchableOpacity
+                //     key={id}
+                //     onPress={() => onPressItem(id)} // onPressItem &&
+                //     style={{
+                //         // backgroundColor: done ? "#1c9963" : "#fff",
+                //         borderColor: "#000",
+                //         borderWidth: 1,
+                //         padding: 8,
+                //     }}
+                // >
+                //     <Text style={{ color: done ? "#fff" : "#000" }}>{value}</Text>
+                // </TouchableOpacity>
+            ))}
+        </>
     );
 }
 //{ done: doneHeading, onPressItem, db }: ItemsProps
 export default function TimeCard() {
-    const [text, setText] = React.useState<string | null>(null);
     const { items, setItems } = useContext(ItemsContext);
-    // const [forceUpdate, forceUpdateId] = useForceUpdate();
 
     useEffect(() => {
         createTimesheetTable();
@@ -94,35 +90,17 @@ export default function TimeCard() {
 
     return (
         <Theme name="green">
-            <View>
-                {Platform.OS === "web" ? (
-                    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                        <Text style={styles.heading}>Expo SQlite is not supported on web!</Text>
-                    </View>
-                ) : (
-                    <>
-                        {/* <View style={styles.flexRow}>
-                            <TextInput
-                                onChangeText={(text) => setText(text)}
-                                onSubmitEditing={() => {
-                                    if (text === null) {
-                                        return;
-                                    }
-                                    addTime(text, setItems);
-                                    setText(null);
-                                }}
-                                placeholder="what do you need to do?"
-                                style={styles.input}
-                                value={text ?? undefined}
-                            />
-                        </View> */}
-                        <ScrollView>
-                            <Items key={`times`} onPressItem={(id) => deleteTime(id, setItems)} />
-                            {/* <Items key={`forceupdate-done`} done={true} onPressItem={(id) => deleteTime(id, setItems)} /> */}
-                        </ScrollView>
-                    </>
-                )}
-            </View>
+            {/* <View> */}
+            {Platform.OS === "web" ? (
+                <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                    <Text style={styles.heading}>Expo SQlite is not supported on web!</Text>
+                </View>
+            ) : (
+                <ScrollView width="100%" backgroundColor="$gray2Dark" padding="$4" borderRadius="$4">
+                    <Items key={`times`} onPressItem={(id) => deleteTime(id, setItems)} />
+                </ScrollView>
+            )}
+            {/* </View> */}
         </Theme>
     );
 }
