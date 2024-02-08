@@ -9,8 +9,8 @@ export default function TabOneScreen() {
         // Fake input for now
 
         const date = new Date();
-        const startTime = date.setHours(9, 0, 0, 0);
-        const endTime = date.setHours(17, 0, 0, 0);
+        const startTime = new Date().setHours(9, 0, 0, 0);
+        const endTime = new Date().setHours(17, 0, 0, 0);
         const hours = endTime - startTime;
 
         const timeEntry = {

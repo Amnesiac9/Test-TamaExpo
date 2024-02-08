@@ -1,19 +1,12 @@
 import { useEffect, useContext } from "react";
-import { Platform, StyleSheet } from "react-native";
-import { Theme, Text, View, ListItem, Separator, Group, XGroup, YGroup, YStack, ScrollView } from "tamagui";
+import { Platform } from "react-native";
+import { Theme, Text, View, ListItem, Separator, Group, XGroup, YGroup, YStack, ScrollView, Button } from "tamagui";
 import Constants from "expo-constants";
-import * as SQLite from "expo-sqlite";
 import React from "react";
 import { ItemsContext, addTime, db, deleteTime, updateTime, useForceUpdate, createTimesheetTable } from "../shared";
 
 interface ItemsProps {
     onPressItem: (id: number) => void; //(id: number) => void replace with the actual type
-}
-
-interface TimeCardProps {
-    // add: (text: string, forceUpdate: () => void) => void; // replace with the actual type
-    addTime: typeof addTime;
-    db: SQLite.SQLiteDatabase;
 }
 
 function Items({ onPressItem }: ItemsProps) {
@@ -41,28 +34,34 @@ function Items({ onPressItem }: ItemsProps) {
     // const filteredItems = items.filter((item) => Boolean(item.done) === doneHeading);
 
     return (
-        <>
+        <YStack padding="$3" gap="$3" alignItems="center" maxWidth={"100%"}>
             <Text>Timesheet</Text>
+            {/* <Group orientation="horizontal">
+                <ListItem>First</ListItem>
+                <ListItem>First</ListItem>
+                <Button>Test</Button>
+            </Group> */}
+
             {items.map(({ id, date, startTime, endTime, hours, wages, note }) => (
-                <XGroup orientation="vertical" separator={<Separator />} padding="$3" space="$2">
-                    <Group.Item>
-                        <Text>{date}</Text>
-                    </Group.Item>
-                    <Group.Item>
-                        <Text>{startTime}</Text>
-                    </Group.Item>
-                    <Group.Item>
-                        <Text>{endTime}</Text>
-                    </Group.Item>
-                    <Group.Item>
-                        <Text>{hours}</Text>
-                    </Group.Item>
-                    <Group.Item>
-                        <Text>{wages}</Text>
-                    </Group.Item>
-                    <Group.Item>
-                        <Text>{note}</Text>
-                    </Group.Item>
+                <XGroup orientation="horizontal" separator={<Separator />} maxWidth={"100%"} size="$4" onPress={() => onPressItem(id)}>
+                    <XGroup.Item>
+                        <ListItem>{date}</ListItem>
+                    </XGroup.Item>
+                    {/* <Group.Item>
+                            <Text>{startTime}</Text>
+                        </Group.Item>
+                        <Group.Item>
+                            <Text>{endTime}</Text>
+                        </Group.Item>
+                        <Group.Item>
+                            <Text>{hours}</Text>
+                        </Group.Item>
+                        <Group.Item>
+                            <Text>{wages}</Text>
+                        </Group.Item> */}
+                    <XGroup.Item>
+                        <ListItem>{note}</ListItem>
+                    </XGroup.Item>
                 </XGroup>
                 // <TouchableOpacity
                 //     key={id}
@@ -77,7 +76,7 @@ function Items({ onPressItem }: ItemsProps) {
                 //     <Text style={{ color: done ? "#fff" : "#000" }}>{value}</Text>
                 // </TouchableOpacity>
             ))}
-        </>
+        </YStack>
     );
 }
 //{ done: doneHeading, onPressItem, db }: ItemsProps
@@ -93,10 +92,10 @@ export default function TimeCard() {
             {/* <View> */}
             {Platform.OS === "web" ? (
                 <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                    <Text style={styles.heading}>Expo SQlite is not supported on web!</Text>
+                    <Text>Expo SQlite is not supported on web!</Text>
                 </View>
             ) : (
-                <ScrollView width="100%" backgroundColor="$gray2Dark" padding="$4" borderRadius="$4">
+                <ScrollView width="100%" padding="$4" borderRadius="$4">
                     <Items key={`times`} onPressItem={(id) => deleteTime(id, setItems)} />
                 </ScrollView>
             )}
@@ -104,41 +103,3 @@ export default function TimeCard() {
         </Theme>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        backgroundColor: "#fff",
-        flex: 1,
-        paddingTop: Constants.statusBarHeight,
-    },
-    heading: {
-        fontSize: 20,
-        fontWeight: "bold",
-        textAlign: "center",
-    },
-    flexRow: {
-        flexDirection: "row",
-    },
-    input: {
-        borderColor: "#4630eb",
-        borderRadius: 4,
-        borderWidth: 1,
-        flex: 1,
-        height: 48,
-        margin: 16,
-        padding: 8,
-    },
-    listArea: {
-        backgroundColor: "#f0f0f0",
-        flex: 1,
-        paddingTop: 16,
-    },
-    sectionContainer: {
-        marginBottom: 16,
-        marginHorizontal: 16,
-    },
-    sectionHeading: {
-        fontSize: 18,
-        marginBottom: 8,
-    },
-});
