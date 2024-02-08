@@ -26,7 +26,21 @@ export function useForceUpdate() {
     return [() => setValue(value + 1), value];
 }
 
-export const addTime = (text: string, forceUpdate: () => void) => {
+export const fetchItems = (setItems: Dispatch<SetStateAction<Item[] | null>>) => {
+    db.transaction(
+        (tx) => {
+            tx.executeSql("select * from items", [], (_, resultSet) => {
+                const items = resultSet.rows._array;
+                setItems(items);
+            });
+        },
+        (error: SQLError) => {
+            console.error("An error occurred while executing the transaction:", error);
+        }
+    );
+};
+
+export const addTime = (text: string, setItems: Dispatch<SetStateAction<Item[] | null>>) => {
     // is text empty?
     if (text === null || text === "") {
         return false;
@@ -35,16 +49,15 @@ export const addTime = (text: string, forceUpdate: () => void) => {
     db.transaction(
         (tx) => {
             tx.executeSql("insert into items (done, value) values (0, ?)", [text]);
-            tx.executeSql("select * from items", [], (_, { rows }) => console.log(JSON.stringify(rows)));
         },
         (error: SQLError) => {
             console.error("An error occurred while executing the transaction:", error);
         },
-        forceUpdate // forceUpdate is a function, but TypeScript doesn't know that?
+        () => fetchItems(setItems) // Fetch all items after the new item has been added
     );
 };
 
-export const deleteTime = (id: number, forceUpdate: () => void) => {
+export const deleteTime = (id: number, setItems: Dispatch<SetStateAction<Item[] | null>>) => {
     db.transaction(
         (tx: SQLite.SQLTransaction) => {
             tx.executeSql(`delete from items where id = ?;`, [id]);
@@ -52,11 +65,11 @@ export const deleteTime = (id: number, forceUpdate: () => void) => {
         (error: SQLError) => {
             console.error("An error occurred while executing the transaction:", error);
         },
-        forceUpdate // forceUpdate is a function, but TypeScript doesn't know that?
+        () => fetchItems(setItems) // Fetch all items after the new item has been added
     );
 };
 
-export const updateTime = (id: number, forceUpdate: () => void) => {
+export const updateTime = (id: number, setItems: Dispatch<SetStateAction<Item[] | null>>) => {
     db.transaction(
         (tx: SQLite.SQLTransaction) => {
             tx.executeSql(`update items set done = 1 where id = ?;`, [id]);
@@ -64,7 +77,7 @@ export const updateTime = (id: number, forceUpdate: () => void) => {
         (error: SQLError) => {
             console.error("An error occurred while executing the transaction:", error);
         },
-        forceUpdate // forceUpdate is a function, but TypeScript doesn't know that?
+        () => fetchItems(setItems) // Fetch all items after the new item has been added
     );
 };
 

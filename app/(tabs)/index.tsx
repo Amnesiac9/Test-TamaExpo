@@ -1,13 +1,14 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Theme, Text, View, H2, Button, Separator } from "tamagui";
-import { addTime, useForceUpdate } from "../shared";
-
-function handleAddTime(time: string, forceUpdate: () => void) {
-    addTime(time, forceUpdate);
-}
+import { addTime, useForceUpdate, ItemsContext } from "../shared";
 
 export default function TabOneScreen() {
-    const [forceUpdate, forceUpdateId] = useForceUpdate();
+    const { items, setItems } = useContext(ItemsContext);
+
+    function handleAddTime(time: string) {
+        addTime(time, setItems);
+    }
+
     return (
         <View flex={1} alignItems="center">
             <Theme name="green">
@@ -19,7 +20,7 @@ export default function TabOneScreen() {
                 {/* <View width={"75%"}> */}
                 <Button>Clock In</Button>
                 <Separator borderWidth={0.5} width={"50%"} marginVertical={20} />
-                <Button onPress={() => handleAddTime("10:50", forceUpdate as () => void)}>Add Time</Button>
+                <Button onPress={() => handleAddTime("10:50")}>Add Time</Button>
                 <Separator borderWidth={0.5} width={"50%"} marginVertical={20} />
                 <Button>View Timecard</Button>
                 {/* </View> */}

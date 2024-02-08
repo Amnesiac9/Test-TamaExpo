@@ -1,16 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Platform, ScrollView, StyleSheet, TextInput, TouchableOpacity } from "react-native";
 import { Text, View } from "tamagui";
 import Constants from "expo-constants";
 import * as SQLite from "expo-sqlite";
 import { SQLError } from "expo-sqlite";
 import React from "react";
-import { addTime, db, deleteTime, updateTime, useForceUpdate } from "../shared";
+import { ItemsContext, addTime, db, deleteTime, updateTime, useForceUpdate } from "../shared";
 
 interface ItemsProps {
     done: boolean;
     onPressItem: (id: number) => void; //(id: number) => void replace with the actual type
-    forceUpdate: () => void;
 }
 
 interface TimeCardProps {
@@ -27,28 +26,33 @@ interface Item {
 }
 
 function Items({ done: doneHeading, onPressItem }: ItemsProps) {
-    const [items, setItems] = useState<Item[] | null>(null);
+    const { items, setItems } = useContext(ItemsContext);
 
-    useEffect(() => {
-        db.transaction((tx) => {
-            tx.executeSql(`select * from items where done = ?;`, [doneHeading ? 1 : 0], (_, { rows: { _array } }) => setItems(_array));
-        });
-    }, []);
+    // useEffect(() => {
+    //     if (items === null) {
+    //         db.transaction((tx) => {
+    //             tx.executeSql(`select * from items where done = ?;`, [doneHeading ? 1 : 0], (_, { rows: { _array } }) => setItems(_array));
+    //         });
+    //     }
+    // }, []);
 
     // useEffect(() => {
     //     forceUpdate();
     // }, [items]);
 
-    const heading = doneHeading ? "Completed" : "Todo";
-
     if (items === null || items.length === 0) {
         return null;
     }
 
+    const heading = doneHeading ? "Completed" : "Todo";
+
+    // Filter items based on their done status
+    const filteredItems = items.filter((item) => Boolean(item.done) === doneHeading);
+
     return (
         <View style={styles.sectionContainer}>
             <Text style={styles.sectionHeading}>{heading}</Text>
-            {items.map(({ id, done, value }) => (
+            {filteredItems.map(({ id, done, value }) => (
                 <TouchableOpacity
                     key={id}
                     onPress={() => onPressItem(id)} // onPressItem &&
@@ -68,7 +72,8 @@ function Items({ done: doneHeading, onPressItem }: ItemsProps) {
 //{ done: doneHeading, onPressItem, db }: ItemsProps
 export default function TimeCard() {
     const [text, setText] = React.useState<string | null>(null);
-    const [forceUpdate, forceUpdateId] = useForceUpdate();
+    const { items, setItems } = useContext(ItemsContext);
+    // const [forceUpdate, forceUpdateId] = useForceUpdate();
 
     useEffect(() => {
         db.transaction((tx: SQLite.SQLTransaction) => {
@@ -93,7 +98,7 @@ export default function TimeCard() {
                                 if (text === null) {
                                     return;
                                 }
-                                addTime(text, forceUpdate as () => void);
+                                addTime(text, setItems);
                                 setText(null);
                             }}
                             placeholder="what do you need to do?"
@@ -102,18 +107,8 @@ export default function TimeCard() {
                         />
                     </View>
                     <ScrollView style={styles.listArea}>
-                        <Items
-                            key={`forceupdate-todo-${forceUpdateId}`}
-                            done={false}
-                            onPressItem={(id) => updateTime(id, forceUpdate as () => void)}
-                            forceUpdate={forceUpdate as () => void}
-                        />
-                        <Items
-                            key={`forceupdate-done-${forceUpdateId}`}
-                            done={true}
-                            onPressItem={(id) => deleteTime(id, forceUpdate as () => void)}
-                            forceUpdate={forceUpdate as () => void}
-                        />
+                        <Items key={`forceupdate-todo`} done={false} onPressItem={(id) => updateTime(id, setItems)} />
+                        <Items key={`forceupdate-done`} done={true} onPressItem={(id) => deleteTime(id, setItems)} />
                     </ScrollView>
                 </>
             )}
