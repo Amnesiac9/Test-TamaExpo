@@ -68,10 +68,10 @@ function Items({ onPressItem }: ItemsProps) {
             {items.map(({ id, date, startTime, endTime, hours, wages, note }) => (
                 <XGroup orientation="horizontal" maxWidth={"50%"} onPress={() => onPressItem(id)}>
                     <XGroup.Item>
-                        <ListItem>{date}</ListItem>
+                        <ListItem maxWidth={"90%"}>{date}</ListItem>
                     </XGroup.Item>
                     <Group.Item>
-                        <Text>{startTime}</Text>
+                        <ListItem>{startTime}</ListItem>
                     </Group.Item>
                     {/* <Group.Item>
                             <Text>{endTime}</Text>
@@ -86,18 +86,6 @@ function Items({ onPressItem }: ItemsProps) {
                         <ListItem>{note}</ListItem>
                     </XGroup.Item> */}
                 </XGroup>
-                // <TouchableOpacity
-                //     key={id}
-                //     onPress={() => onPressItem(id)} // onPressItem &&
-                //     style={{
-                //         // backgroundColor: done ? "#1c9963" : "#fff",
-                //         borderColor: "#000",
-                //         borderWidth: 1,
-                //         padding: 8,
-                //     }}
-                // >
-                //     <Text style={{ color: done ? "#fff" : "#000" }}>{value}</Text>
-                // </TouchableOpacity>
             ))}
         </YStack>
     );
