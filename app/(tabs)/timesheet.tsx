@@ -1,6 +1,6 @@
 import { useEffect, useContext } from "react";
 import { Platform } from "react-native";
-import { Theme, Text, View, ListItem, Separator, Group, XGroup, YGroup, YStack, ScrollView, Button } from "tamagui";
+import { Theme, Text, View, ListItem, Separator, Group, XGroup, YGroup, YStack, XStack, ScrollView, Button, ThemeableStack } from "tamagui";
 import Constants from "expo-constants";
 import React from "react";
 import { ItemsContext, addTime, db, deleteTime, updateTime, useForceUpdate, createTimesheetTable, fetchItems } from "../shared";
@@ -21,7 +21,7 @@ export default function TimeCard() {
                     <Text>Expo SQlite is not supported on web!</Text>
                 </View>
             ) : (
-                <ScrollView width="100%" padding="$4" borderRadius="$4">
+                <ScrollView width="100%" padding="$1" borderRadius="$1">
                     <Items key={`times`} onPressItem={(id) => deleteTime(id, setItems)} />
                 </ScrollView>
             )}
@@ -57,36 +57,27 @@ function Items({ onPressItem }: ItemsProps) {
     // const filteredItems = items.filter((item) => Boolean(item.done) === doneHeading);
 
     return (
-        <YStack padding="$3" gap="$3">
+        <ThemeableStack flex={5} gap={5}>
             {/* <Text>Timesheet</Text> */}
-            {/* <Group orientation="horizontal">
-                <ListItem>First</ListItem>
-                <ListItem>First</ListItem>
-                <Button>Test</Button>
-            </Group> */}
-
             {items.map(({ id, date, startTime, endTime, hours, wages, note }) => (
-                <XGroup orientation="horizontal" maxWidth={"50%"} onPress={() => onPressItem(id)}>
-                    <XGroup.Item>
-                        <ListItem maxWidth={"90%"}>{date}</ListItem>
-                    </XGroup.Item>
-                    <Group.Item>
-                        <ListItem>{startTime}</ListItem>
-                    </Group.Item>
-                    {/* <Group.Item>
-                            <Text>{endTime}</Text>
-                        </Group.Item>
-                        <Group.Item>
-                            <Text>{hours}</Text>
-                        </Group.Item>
-                        <Group.Item>
-                            <Text>{wages}</Text>
-                        </Group.Item> */}
-                    {/* <XGroup.Item>
-                        <ListItem>{note}</ListItem>
-                    </XGroup.Item> */}
-                </XGroup>
+                <ThemeableStack
+                    bordered
+                    borderRadius={15}
+                    padded
+                    backgroundColor={"$background"}
+                    onPress={() => onPressItem(id)}
+                    style={{ alignItems: "left" }}
+                    maxHeight={120}
+                    flexDirection="column"
+                    flexWrap="wrap"
+                    justifyContent="flex-start"
+                    alignItems="flex-start"
+                >
+                    <Text width="50%">{date}</Text>
+                    <Text width="50%">Start: {startTime}</Text>
+                    <Text width="50%">End: {endTime}</Text>
+                </ThemeableStack>
             ))}
-        </YStack>
+        </ThemeableStack>
     );
 }
