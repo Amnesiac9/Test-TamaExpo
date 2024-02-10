@@ -68,15 +68,24 @@ function Items({ onPressItem }: ItemsProps) {
                         backgroundColor={"$background"}
                         onPress={() => onPressItem(id)}
                         style={{ alignItems: "left" }}
-                        maxHeight={120}
+                        maxHeight={100}
                         flexDirection="column"
                         flexWrap="wrap"
-                        justifyContent="flex-start"
-                        alignItems="flex-start"
+                        justifyContent="center"
+                        alignItems="center"
                     >
                         <Text width="50%">{date}</Text>
                         <Text width="50%">Start: {startTime}</Text>
                         <Text width="50%">End: {endTime}</Text>
+                        <Text width="50%">Hours: {hours}</Text>
+                        <Text width="50%">
+                            <Text fontWeight={"$15"}>Wages: </Text>
+                            {wages}
+                        </Text>
+                        <Text width="50%">
+                            <Text fontWeight={"$10"}>Note: </Text>
+                            {note}
+                        </Text>
                     </ThemeableStack>
                 ))}
             </ThemeableStack>

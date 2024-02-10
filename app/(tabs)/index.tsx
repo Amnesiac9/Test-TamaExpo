@@ -9,15 +9,17 @@ export default function TabOneScreen() {
         // Fake input for now
 
         const date = new Date();
-        const startTime = new Date().setHours(9, 0, 0, 0);
-        const endTime = new Date().setHours(17, 0, 0, 0);
-        const hours = endTime - startTime;
+        const startTime = new Date();
+        startTime.setHours(9, 0, 0, 0);
+        const endTime = new Date();
+        endTime.setHours(17, 0, 0, 0);
+        const hours = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60);
 
         const timeEntry = {
             id: 0,
             date: date.toDateString(),
-            startTime: startTime.toString(),
-            endTime: endTime.toString(),
+            startTime: startTime.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true }),
+            endTime: endTime.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true }),
             hours: hours,
             wages: hours * 15,
             note: "Lunch",
