@@ -21,9 +21,7 @@ export default function TimeCard() {
                     <Text>Expo SQlite is not supported on web!</Text>
                 </View>
             ) : (
-                <ScrollView width="100%" padding="$1" borderRadius="$1">
-                    <Items key={`times`} onPressItem={(id) => deleteTime(id, setItems)} />
-                </ScrollView>
+                <Items key={`times`} onPressItem={(id) => deleteTime(id, setItems)} />
             )}
             {/* </View> */}
         </Theme>
@@ -57,27 +55,31 @@ function Items({ onPressItem }: ItemsProps) {
     // const filteredItems = items.filter((item) => Boolean(item.done) === doneHeading);
 
     return (
-        <ThemeableStack flex={5} gap={5}>
-            {/* <Text>Timesheet</Text> */}
-            {items.map(({ id, date, startTime, endTime, hours, wages, note }) => (
-                <ThemeableStack
-                    bordered
-                    borderRadius={15}
-                    padded
-                    backgroundColor={"$background"}
-                    onPress={() => onPressItem(id)}
-                    style={{ alignItems: "left" }}
-                    maxHeight={120}
-                    flexDirection="column"
-                    flexWrap="wrap"
-                    justifyContent="flex-start"
-                    alignItems="flex-start"
-                >
-                    <Text width="50%">{date}</Text>
-                    <Text width="50%">Start: {startTime}</Text>
-                    <Text width="50%">End: {endTime}</Text>
-                </ThemeableStack>
-            ))}
-        </ThemeableStack>
+        <ScrollView width="100%" padding="$1" borderRadius="$1">
+            <ThemeableStack flex={5} gap={5}>
+                {/* <Text>Timesheet</Text> */}
+                {/* Items inside a map need a unique KEY! */}
+                {items.map(({ id, date, startTime, endTime, hours, wages, note }) => (
+                    <ThemeableStack
+                        key={id}
+                        bordered
+                        borderRadius={15}
+                        padded
+                        backgroundColor={"$background"}
+                        onPress={() => onPressItem(id)}
+                        style={{ alignItems: "left" }}
+                        maxHeight={120}
+                        flexDirection="column"
+                        flexWrap="wrap"
+                        justifyContent="flex-start"
+                        alignItems="flex-start"
+                    >
+                        <Text width="50%">{date}</Text>
+                        <Text width="50%">Start: {startTime}</Text>
+                        <Text width="50%">End: {endTime}</Text>
+                    </ThemeableStack>
+                ))}
+            </ThemeableStack>
+        </ScrollView>
     );
 }

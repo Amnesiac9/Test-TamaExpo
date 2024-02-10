@@ -1,41 +1,37 @@
 import { Link, Tabs } from "expo-router";
 import React from "react";
 import { Pressable } from "react-native";
-import { Text } from "tamagui";
+import { Text, Button } from "tamagui";
+import { Plus, AlarmClockPlus, ClipboardList } from "@tamagui/lucide-icons";
 
 export default function TabLayout() {
     return (
         <Tabs
             screenOptions={{
-                tabBarActiveTintColor: "red",
+                tabBarActiveTintColor: "green",
             }}
         >
             <Tabs.Screen
                 name="index"
                 options={{
                     title: "Clock In",
-                    tabBarIcon: ({ color }) => <Text>Hello!</Text>,
+                    tabBarShowLabel: false,
+                    tabBarIcon: (options) => <AlarmClockPlus color={options.color} />,
                     headerRight: () => (
                         <Link href="/modal" asChild>
                             <Pressable>
-                                <Text>Hello!</Text>
+                                <Text>Modal</Text>
                             </Pressable>
                         </Link>
                     ),
                 }}
             />
             <Tabs.Screen
-                name="todo"
-                options={{
-                    title: "Todo",
-                    tabBarIcon: ({ color }) => <Text>Hello!</Text>,
-                }}
-            />
-            <Tabs.Screen
                 name="timesheet"
                 options={{
                     title: "Timesheet",
-                    tabBarIcon: ({ color }) => <Text>Hello!</Text>,
+                    tabBarShowLabel: false,
+                    tabBarIcon: ({ color }) => <ClipboardList color={color} />,
                 }}
             />
         </Tabs>
