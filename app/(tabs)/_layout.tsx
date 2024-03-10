@@ -1,10 +1,13 @@
 import { Link, Tabs } from "expo-router";
 import React from "react";
-import { Pressable } from "react-native";
-import { Text, Button, View } from "tamagui";
+import { Pressable, StyleSheet } from "react-native";
+import { Text, Button, View, Stack } from "tamagui";
 import { Plus, AlarmClockPlus, ClipboardList, Settings } from "@tamagui/lucide-icons";
 
+
+
 export default function TabLayout() {
+
     return (
         <Tabs
             screenOptions={{
