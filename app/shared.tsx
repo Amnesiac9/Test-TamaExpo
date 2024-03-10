@@ -9,7 +9,7 @@ function openDatabase() {
         return {
             transaction: () => {
                 return {
-                    executeSql: () => {},
+                    executeSql: () => { },
                 };
             },
         };
@@ -111,22 +111,11 @@ export interface timeEntry {
 
 const ItemsContext = React.createContext({
     items: null as timeEntry[] | null,
-    setItems: (() => {}) as Dispatch<SetStateAction<timeEntry[] | null>>,
+    setItems: (() => { }) as Dispatch<SetStateAction<timeEntry[] | null>>,
 });
 
 function ItemsProvider({ children }: { children: ReactNode }) {
     const [items, setItems] = useState<timeEntry[] | null>(null);
-
-    // Function to fetch items from database
-    // const fetchItems = () => {
-    //   db.transaction((tx) => {
-    //     tx.executeSql(`select * from items where done = ?;`, [doneHeading ? 1 : 0], (_, { rows: { _array } }) => setItems(_array));
-    //   });
-    // };
-
-    // Fetch items when component mounts
-    // useEffect(fetchItems, []);
-
     return <ItemsContext.Provider value={{ items, setItems }}>{children}</ItemsContext.Provider>;
 }
 
